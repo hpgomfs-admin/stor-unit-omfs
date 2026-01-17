@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Stor Unit</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#F2F2F7">
+    <link rel="icon" type="image/png" href="icon.png">
+
+    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Stor Unit">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <style>
+        /* RESET & LAYOUT */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            overflow: hidden; /* Prevents double scrolling */
+            background-color: #F2F2F7;
+            -webkit-user-select: none; /* Disables text selection on wrapper */
+            user-select: none;
+        }
+
+        /* IFRAME CONTAINER */
+        /* We use position fixed to lock it in place securely */
+        iframe {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 1;
+        }
+
+        /* SPLASH SCREEN */
+        #splash {
+            position: fixed;
+            top: 0; 
+            left: 0;
+            width: 100%; 
+            height: 100%;
+            background-color: #F2F2F7;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        /* IOS SPINNER STYLE */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(0,0,0,0.1);
+            border-top: 4px solid #007AFF;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 14px;
+            color: #8E8E93;
+            font-weight: 500;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <div id="splash">
+        <div class="spinner"></div>
+        <div class="loading-text">Loading Stor Unit...</div>
+    </div>
+
+    <iframe 
+        id="appFrame"
+        src="https://script.google.com/macros/s/AKfycbwWj0qauHckXTNt3f90wjym-Jr3q5c07uSXibL1GKaRfneWvDTZ7Vde6fnXApxhPSK0pQ/exec"
+        allow="camera; microphone; geolocation"
+        scrolling="yes">
+    </iframe>
+
+    <script>
+        // LOGIC: Hide Splash screen only when Google App has loaded
+        const iframe = document.getElementById('appFrame');
+        
+        // Safety timeout: Remove splash after 8 seconds even if Google is slow
+        // (Prevents getting stuck on splash screen forever)
+        const safetyTimer = setTimeout(() => {
+            removeSplash();
+        }, 8000);
+
+        iframe.onload = function() {
+            clearTimeout(safetyTimer); // Google loaded, cancel safety timer
+            // Small delay to ensure visual rendering is complete
+            setTimeout(() => {
+                removeSplash();
+            }, 500);
+        };
+
+        function removeSplash() {
+            const splash = document.getElementById('splash');
+            if(splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => splash.remove(), 500);
+            }
+        }
+    </script>
+</body>
+</html>
